@@ -38,7 +38,7 @@ models:
       - name: first_paid_at
         description: "Время первой успешной оплаты; пусто, если оплат нет."
       - name: is_confirmed
-        description: "Подтверждённая покупка: статус paid и хотя бы одна успешная оплата."
+        description: '{{ doc("confirmed_order") }}'
         data_tests: [not_null]
       - name: items_count
         description: "Число разных товаров в заказе (не сумма quantity)."
@@ -65,6 +65,10 @@ models:
         description: "Товар."
         data_tests:
           - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
       - name: customer_id
         description: "Клиент, оформивший заказ."
         data_tests:
@@ -92,9 +96,9 @@ models:
         data_tests: [not_null]
 
   - name: dim_customers
-    description: >
-      Измерение клиентов, включая тех, кто ничего не купил: одна строка — один клиент.
-      Показатели покупок считаются только по подтверждённым заказам.
+    description: 
+      "Измерение клиентов, включая тех, кто ничего не купил: одна строка — один клиент.
+      Показатели покупок считаются только по подтверждённым заказам."
     columns:
       - name: customer_id
         description: "Идентификатор клиента."
@@ -120,3 +124,26 @@ models:
       - name: is_buyer
         description: "true, если у клиента есть хотя бы одна подтверждённая покупка."
         data_tests: [not_null]
+
+
+  - name: dim_products
+    description: "Измерение товаров: название бренд и иерархия (category_name > parent_category_name > root_category_name)."
+    columns:
+      - name: product_id
+        description: "Идентификатор товара."
+        data_tests: [unique, not_null]
+      - name: product_name
+        description: "Название товара."
+      - name: brand
+        description: "Бренд товара."
+      - name: category_name
+        description: "Название категории товара (лист дерева)."
+        data_tests: [not_null]
+      - name: parent_category_name
+        description: "Родительская категория."
+      - name: root_category_name
+        description: "Корневая категория (Home или Electronics)."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Home', 'Electronics']
