@@ -20,10 +20,20 @@ models:
                 field: customer_id
       - name: order_date
         description: "Дата заказа."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_day
       - name: ordered_at
         description: "Время оформления заказа."
       - name: order_status
         description: "Статус заказа: paid, pending, returned, cancelled."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['paid', 'pending', 'returned', 'cancelled']
       - name: order_amount
         description: "Сумма заказа в рублях после скидок."
         data_tests: [non_negative]
@@ -78,9 +88,13 @@ models:
                 to: ref('dim_customers')
                 field: customer_id
       - name: order_date
-        description: "Дата заказа, ключ к dim_dates."
+        description: "Дата заказа."
         data_tests:
           - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_day
       - name: quantity
         description: "Количество единиц товара."
         data_tests: [non_negative]
@@ -147,3 +161,28 @@ models:
           - accepted_values:
               arguments:
                 values: ['Home', 'Electronics']
+
+
+
+  - name: dim_dates
+    description: "Календарь: одна строка — один день с 2026-03-01 по 2026-07-11.
+      Покрывает все даты заказов."
+    columns:
+      - name: date_day
+        description: "Календарная дата, ключ измерения."
+        data_tests: [unique, not_null]
+      - name: calendar_year
+        description: "Год."
+      - name: calendar_quarter
+        description: "Квартал (1-4)."
+      - name: calendar_month
+        description: "Номер месяца (1-12)."
+      - name: year_month
+        description: "Месяц в формате ГГГГ-ММ."
+      - name: day_of_week
+        description: "День недели: 1 — понедельник, 7 — воскресенье."
+      - name: day_name
+        description: "Название дня недели на английском."
+      - name: is_weekend
+        description: "true для субботы и воскресенья, false иначе."
+        data_tests: [not_null]
