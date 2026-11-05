@@ -12,6 +12,12 @@ models:
         data_tests: [unique, not_null]
       - name: customer_id
         description: "Клиент, оформивший заказ."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
       - name: order_date
         description: "Дата заказа."
       - name: ordered_at
@@ -63,6 +69,10 @@ models:
         description: "Клиент, оформивший заказ."
         data_tests:
           - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
       - name: order_date
         description: "Дата заказа, ключ к dim_dates."
         data_tests:
@@ -79,4 +89,34 @@ models:
         data_tests: [non_negative]
       - name: is_confirmed
         description: '{{ doc("confirmed_order") }}'
+        data_tests: [not_null]
+
+  - name: dim_customers
+    description: >
+      Измерение клиентов, включая тех, кто ничего не купил: одна строка — один клиент.
+      Показатели покупок считаются только по подтверждённым заказам.
+    columns:
+      - name: customer_id
+        description: "Идентификатор клиента."
+        data_tests: [unique, not_null]
+      - name: registered_at
+        description: "Дата и время регистрации клиента."
+      - name: registration_date
+        description: "Дата регистрации клиента."
+      - name: city
+        description: "Город клиента."
+      - name: acquisition_channel
+        description: "Канал привлечения клиента."
+      - name: first_confirmed_order_id
+        description: "Номер первой подтверждённой покупки; пусто, если покупок не было."
+      - name: first_confirmed_at
+        description: "Время первой подтверждённой покупки; пусто, если покупок не было."
+      - name: confirmed_orders_count
+        description: "Число подтверждённых заказов."
+        data_tests: [non_negative]
+      - name: confirmed_revenue
+        description: "Сумма подтверждённых заказов."
+        data_tests: [non_negative]
+      - name: is_buyer
+        description: "true, если у клиента есть хотя бы одна подтверждённая покупка."
         data_tests: [not_null]
