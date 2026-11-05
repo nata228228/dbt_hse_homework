@@ -20,6 +20,7 @@ models:
         description: "Статус заказа: paid, pending, returned, cancelled."
       - name: order_amount
         description: "Сумма заказа в рублях после скидок."
+        data_tests: [non_negative]
       - name: paid_amount
         description: "Сумма успешных оплат без возвратов; 0, если оплат нет."
       - name: refunded_amount
@@ -33,3 +34,6 @@ models:
       - name: is_confirmed
         description: "Подтверждённая покупка: статус paid и хотя бы одна успешная оплата."
         data_tests: [not_null]
+      - name: items_count
+        description: "Число разных товаров в заказе (не сумма quantity)."
+        data_tests: [non_negative]
