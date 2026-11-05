@@ -37,3 +37,46 @@ models:
       - name: items_count
         description: "Число разных товаров в заказе (не сумма quantity)."
         data_tests: [non_negative]
+
+
+
+  - name: fct_order_items
+    description: "Факт товаров в заказе: одна строка — один товар в заказе.
+     Тестовые заказы исключены."
+    columns:
+      - name: order_item_id
+        description: "Составной ключ позиции (order_id - product_id)."
+        data_tests: [unique, not_null]
+      - name: order_id
+        description: "Номер заказа."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: product_id
+        description: "Товар."
+        data_tests:
+          - not_null
+      - name: customer_id
+        description: "Клиент, оформивший заказ."
+        data_tests:
+          - not_null
+      - name: order_date
+        description: "Дата заказа, ключ к dim_dates."
+        data_tests:
+          - not_null
+      - name: quantity
+        description: "Количество единиц товара."
+        data_tests: [non_negative]
+      - name: unit_price
+        description: "Цена за единицу."
+      - name: discount_amount
+        description: "Скидка на позицию."
+      - name: line_amount
+        description: "Сумма позиции после скидки."
+        data_tests: [non_negative]
+      - name: is_confirmed
+        description: '{{ doc("confirmed_order") }}'
+        data_tests: [not_null]
